@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 영화 티어리스트</title>
+<style>
+  :root {
+    --bg: #f3f3f7;
+    --surface: #ffffff;
+    --row: #ebebf1;
+    --text: #1c1c22;
+    --muted: #6b6b78;
+    --border: #d9d9e2;
+    --card: #ffffff;
+    --card-border: #d2d2dc;
+    --accent: #4c6ef5;
+    --accent-text: #ffffff;
+    --danger: #e03131;
+    --shadow: 0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.05);
+    --tier-s: #ff6b6b;
+    --tier-a: #ffa94d;
+    --tier-b: #ffd43b;
+    --tier-c: #69db7c;
+    --tier-d: #4dabf7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #131317;
+      --surface: #1c1c22;
+      --row: #24242c;
+      --text: #ececf1;
+      --muted: #9b9ba8;
+      --border: #33333d;
+      --card: #2e2e37;
+      --card-border: #41414c;
+      --accent: #748ffc;
+      --accent-text: #0e0e12;
+      --danger: #ff6b6b;
+      --shadow: 0 1px 2px rgba(0,0,0,.4);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
+
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  h1 { font-size: 26px; margin: 0; letter-spacing: -0.02em; }
+  .hint { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  button {
+    font: inherit;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: 9px 14px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  button:hover { border-color: var(--muted); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  button.primary:hover { filter: brightness(1.07); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .board {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .tier {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    min-height: 76px;
+  }
+  .tier + .tier { border-top: 1px solid var(--border); }
+  .label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 800;
+    color: #1a1a1a;
+  }
+  .tier[data-tier="S"] .label { background: var(--tier-s); }
+  .tier[data-tier="A"] .label { background: var(--tier-a); }
+  .tier[data-tier="B"] .label { background: var(--tier-b); }
+  .tier[data-tier="C"] .label { background: var(--tier-c); }
+  .tier[data-tier="D"] .label { background: var(--tier-d); }
+
+  .zone {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 8px;
+    padding: 10px;
+    min-height: 76px;
+    transition: background-color .12s;
+  }
+  .tier .zone { background: var(--row); }
+  .zone.over { background: color-mix(in srgb, var(--accent) 14%, var(--row)); }
+
+  .pool {
+    margin-top: 16px;
+    min-height: 120px;
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    background: transparent;
+  }
+  .pool.over { background: color-mix(in srgb, var(--accent) 10%, transparent); border-color: var(--accent); }
+
+  .card {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 6px 8px 12px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    font-size: 15px;
+    font-weight: 600;
+    max-width: 100%;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+  .card .emoji { font-size: 20px; line-height: 1; }
+  .card .title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card .del {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    padding: 2px 6px;
+    font-size: 13px;
+    line-height: 1;
+    border-radius: 6px;
+    margin-left: 2px;
+  }
+  .card .del:hover { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+
+  .card.source { display: none; }
+  .slot {
+    border: 2px dashed var(--accent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+  .ghost {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    pointer-events: none;
+    cursor: grabbing;
+    box-shadow: 0 10px 24px rgba(0,0,0,.25);
+    opacity: .95;
+  }
+  body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
+
+  .add {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .add h2 { width: 100%; font-size: 16px; margin: 0 0 2px; }
+  .add input {
+    font: inherit;
+    font-size: 15px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    min-width: 0;
+  }
+  .add input[name="title"] { flex: 1 1 200px; }
+  .add input[name="emoji"] { width: 110px; flex: 0 0 auto; text-align: center; }
+  .add .msg { width: 100%; font-size: 13px; color: var(--danger); min-height: 1.2em; margin: 0; }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text);
+    color: var(--bg);
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s, transform .2s;
+    max-width: calc(100% - 32px);
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 560px) {
+    .wrap { padding-top: 16px; }
+    h1 { font-size: 22px; }
+    header { flex-direction: column; align-items: stretch; }
+    .actions button { flex: 1; }
+    .tier { grid-template-columns: 52px 1fr; min-height: 64px; }
+    .label { font-size: 24px; }
+    .zone { min-height: 64px; padding: 8px; gap: 6px; }
+    .card { font-size: 14px; padding: 7px 4px 7px 10px; }
+    .card .emoji { font-size: 18px; }
+    .add input[name="emoji"] { width: 90px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>내 영화 티어리스트</h1>
+    <div class="actions">
+      <button type="button" class="primary" id="saveImage">이미지로 저장</button>
+      <button type="button" id="reset">처음으로</button>
+    </div>
+  </header>
+  <p class="hint">영화 카드를 끌어서 등급 칸에 놓으세요. 같은 칸 안에서도 끌어서 순서를 바꿀 수 있어요.</p>
+
+  <section class="board" aria-label="등급 칸">
+    <div class="tier" data-tier="S"><div class="label">S</div><div class="zone" data-zone="S"></div></div>
+    <div class="tier" data-tier="A"><div class="label">A</div><div class="zone" data-zone="A"></div></div>
+    <div class="tier" data-tier="B"><div class="label">B</div><div class="zone" data-zone="B"></div></div>
+    <div class="tier" data-tier="C"><div class="label">C</div><div class="zone" data-zone="C"></div></div>
+    <div class="tier" data-tier="D"><div class="label">D</div><div class="zone" data-zone="D"></div></div>
+  </section>
+
+  <div class="zone pool" data-zone="pool" aria-label="대기 칸"></div>
+
+  <form class="add" id="addForm" autocomplete="off">
+    <h2>영화 추가</h2>
+    <input name="title" type="text" maxlength="30" placeholder="영화 제목" aria-label="영화 제목">
+    <input name="emoji" type="text" maxlength="8" placeholder="이모지 🎬" aria-label="이모지 (비워 두면 🎬)">
+    <button type="submit">추가</button>
+    <p class="msg" id="addMsg" role="status"></p>
+  </form>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var TIERS = ["S", "A", "B", "C", "D"];
+  var ZONES = TIERS.concat(["pool"]);
+  var TIER_COLORS = { S: "#ff6b6b", A: "#ffa94d", B: "#ffd43b", C: "#69db7c", D: "#4dabf7" };
+  var DEFAULT_EMOJI = "🎬";
+  var STORAGE_KEY = "movie-tierlist-v1";
+  var DEFAULT_MOVIES = [
+    ["🏠", "기생충"],
+    ["🚀", "인터스텔라"],
+    ["🎹", "라라랜드"],
+    ["🐉", "센과 치히로의 행방불명"],
+    ["🛡️", "어벤져스: 엔드게임"],
+    ["👊", "범죄도시"],
+    ["🚢", "타이타닉"],
+    ["🤠", "토이 스토리"]
+  ];
+
+  // ---------- 상태 ----------
+  function defaultState() {
+    var movies = DEFAULT_MOVIES.map(function (m, i) {
+      return { id: "m" + (i + 1), emoji: m[0], title: m[1] };
+    });
+    var zones = {};
+    ZONES.forEach(function (z) { zones[z] = []; });
+    zones.pool = movies.map(function (m) { return m.id; });
+    return { movies: movies, zones: zones, nextId: movies.length + 1 };
+  }
+
+  function normalize(s) {
+    if (!s || !Array.isArray(s.movies) || !s.zones) return defaultState();
+    var movies = s.movies
+      .filter(function (m) { return m && typeof m.id === "string" && typeof m.title === "string"; })
+      .map(function (m) {
+        return {
+          id: m.id,
+          title: m.title.slice(0, 40),
+          emoji: typeof m.emoji === "string" && m.emoji ? m.emoji : DEFAULT_EMOJI
+        };
+      });
+    var known = {};
+    movies.forEach(function (m) { known[m.id] = true; });
+    var seen = {};
+    var zones = {};
+    ZONES.forEach(function (z) {
+      var list = Array.isArray(s.zones[z]) ? s.zones[z] : [];
+      zones[z] = list.filter(function (id) {
+        if (!known[id] || seen[id]) return false;
+        seen[id] = true;
+        return true;
+      });
+    });
+    movies.forEach(function (m) { if (!seen[m.id]) zones.pool.push(m.id); });
+    var nextId = Number(s.nextId) || 1;
+    movies.forEach(function (m) {
+      var n = parseInt(m.id.slice(1), 10);
+      if (n >= nextId) nextId = n + 1;
+    });
+    return { movies: movies, zones: zones, nextId: nextId };
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? normalize(JSON.parse(raw)) : defaultState();
+    } catch (e) {
+      return defaultState();
+    }
+  }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* 저장 불가 환경 */ }
+  }
+
+  function findMovie(id) {
+    for (var i = 0; i < state.movies.length; i++) if (state.movies[i].id === id) return state.movies[i];
+    return null;
+  }
+
+  var state = load();
+
+  // ---------- 화면 그리기 ----------
+  var zoneEls = {};
+  ZONES.forEach(function (z) { zoneEls[z] = document.querySelector('[data-zone="' + z + '"]'); });
+
+  function makeCard(m) {
+    var card = document.createElement("div");
+    card.className = "card";
+    card.dataset.id = m.id;
+    var e = document.createElement("span");
+    e.className = "emoji";
+    e.textContent = m.emoji;
+    var t = document.createElement("span");
+    t.className = "title";
+    t.textContent = m.title;
+    var del = document.createElement("button");
+    del.type = "button";
+    del.className = "del";
+    del.textContent = "✕";
+    del.setAttribute("aria-label", m.title + " 삭제");
+    del.title = "삭제";
+    card.appendChild(e);
+    card.appendChild(t);
+    card.appendChild(del);
+    return card;
+  }
+
+  function render() {
+    ZONES.forEach(function (z) {
+      var el = zoneEls[z];
+      el.textContent = "";
+      state.zones[z].forEach(function (id) {
+        var m = findMovie(id);
+        if (m) el.appendChild(makeCard(m));
+      });
+    });
+  }
+
+  function readOrderFromDom() {
+    ZONES.forEach(function (z) {
+      state.zones[z] = Array.prototype.map.call(
+        zoneEls[z].querySelectorAll(".card"),
+        function (c) { return c.dataset.id; }
+      );
+    });
+  }
+
+  // ---------- 끌어다 놓기 (마우스·손가락 공통) ----------
+  var drag = null;
+
+  document.addEventListener("pointerdown", function (e) {
+    if (drag) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (e.target.closest(".del")) return;
+    var card = e.target.closest(".card");
+    if (!card || card.classList.contains("ghost")) return;
+    e.preventDefault();
+    drag = {
+      card: card,
+      pointerId: e.pointerId,
+      startX: e.clientX, startY: e.clientY,
+      x: e.clientX, y: e.clientY,
+      active: false, ghost: null, slot: null, over: null, offX: 0, offY: 0
+    };
+    try { document.body.setPointerCapture(e.pointerId); } catch (err) { /* 무시 */ }
+  });
+
+  document.addEventListener("pointermove", function (e) {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    drag.x = e.clientX;
+    drag.y = e.clientY;
+    if (!drag.active) {
+      if (Math.hypot(drag.x - drag.startX, drag.y - drag.startY) < 6) return;
+      startDrag();
+    }
+    e.preventDefault();
+    moveGhost();
+    placeAt(drag.x, drag.y);
+  });
+
+  document.addEventListener("pointerup", function (e) {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    finishDrag(true);
+  });
+  document.addEventListener("pointercancel", function (e) {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    finishDrag(false);
+  });
+
+  function startDrag() {
+    var card = drag.card;
+    var r = card.getBoundingClientRect();
+    drag.offX = drag.startX - r.left;
+    drag.offY = drag.startY - r.top;
+
+    var ghost = card.cloneNode(true);
+    ghost.classList.add("ghost");
+    ghost.style.width = r.width + "px";
+    document.body.appendChild(ghost);
+
+    var slot = document.createElement("div");
+    slot.className = "slot";
+    slot.style.width = r.width + "px";
+    slot.style.height = r.height + "px";
+    card.parentNode.insertBefore(slot, card);
+    card.classList.add("source");
+
+    drag.ghost = ghost;
+    drag.slot = slot;
+    drag.origin = { zone: card.parentNode, next: card.nextSibling };
+    drag.active = true;
+    document.body.classList.add("is-dragging");
+    moveGhost();
+    requestAnimationFrame(autoScroll);
+  }
+
+  function moveGhost() {
+    drag.ghost.style.transform =
+      "translate(" + (drag.x - drag.offX) + "px," + (drag.y - drag.offY) + "px) rotate(2deg)";
+  }
+
+  function zoneAt(x, y) {
+    var el = document.elementFromPoint(x, y);
+    if (!el) return null;
+    var zone = el.closest(".zone");
+    if (zone) return zone;
+    var tier = el.closest(".tier");
+    return tier ? tier.querySelector(".zone") : null;
+  }
+
+  function placeAt(x, y) {
+    var zone = zoneAt(x, y);
+    if (drag.over && drag.over !== zone) drag.over.classList.remove("over");
+    if (!zone) { drag.over = null; return; }
+    zone.classList.add("over");
+    drag.over = zone;
+
+    var cards = zone.querySelectorAll(".card:not(.source)");
+    var before = null;
+    for (var i = 0; i < cards.length; i++) {
+      var r = cards[i].getBoundingClientRect();
+      if (y < r.top) { before = cards[i]; break; }
+      if (y <= r.bottom && x < r.left + r.width / 2) { before = cards[i]; break; }
+    }
+    var slot = drag.slot;
+    if (before) {
+      if (slot.parentNode !== zone || slot.nextElementSibling !== before) zone.insertBefore(slot, before);
+    } else if (slot.parentNode !== zone || zone.lastElementChild !== slot) {
+      zone.appendChild(slot);
+    }
+  }
+
+  function autoScroll() {
+    if (!drag || !drag.active) return;
+    var edge = 70;
+    var h = window.innerHeight;
+    var dy = 0;
+    if (drag.y < edge) dy = -Math.ceil((edge - drag.y) / 5);
+    else if (drag.y > h - edge) dy = Math.ceil((drag.y - (h - edge)) / 5);
+    if (dy) {
+      window.scrollBy(0, dy);
+      placeAt(drag.x, drag.y);
+    }
+    requestAnimationFrame(autoScroll);
+  }
+
+  function finishDrag(commit) {
+    var d = drag;
+    drag = null;
+    try { document.body.releasePointerCapture(d.pointerId); } catch (err) { /* 무시 */ }
+    if (!d.active) return;
+    document.body.classList.remove("is-dragging");
+    if (d.over) d.over.classList.remove("over");
+    d.ghost.remove();
+    if (commit && d.slot.parentNode) {
+      d.slot.parentNode.insertBefore(d.card, d.slot);
+    }
+    d.slot.remove();
+    d.card.classList.remove("source");
+    readOrderFromDom();
+    save();
+  }
+
+  // ---------- 삭제 ----------
+  document.addEventListener("click", function (e) {
+    var del = e.target.closest(".del");
+    if (!del) return;
+    var card = del.closest(".card");
+    var m = card && findMovie(card.dataset.id);
+    if (!m) return;
+    if (!confirm("‘" + m.title + "’을(를) 정말 삭제할까요?")) return;
+    state.movies = state.movies.filter(function (x) { return x.id !== m.id; });
+    ZONES.forEach(function (z) {
+      state.zones[z] = state.zones[z].filter(function (id) { return id !== m.id; });
+    });
+    save();
+    render();
+    showToast("‘" + m.title + "’을(를) 삭제했어요.");
+  });
+
+  // ---------- 처음으로 되돌리기 ----------
+  document.getElementById("reset").addEventListener("click", function () {
+    if (!confirm("모든 영화를 등급 칸에서 빼서 처음 상태로 되돌릴까요?\n추가한 영화는 지워지지 않아요.")) return;
+    ZONES.forEach(function (z) { state.zones[z] = []; });
+    state.zones.pool = state.movies.map(function (m) { return m.id; });
+    save();
+    render();
+    showToast("처음 상태로 되돌렸어요.");
+  });
+
+  // ---------- 영화 추가 ----------
+  var form = document.getElementById("addForm");
+  var addMsg = document.getElementById("addMsg");
+
+  function firstGrapheme(str) {
+    if (!str) return "";
+    if (window.Intl && Intl.Segmenter) {
+      var it = new Intl.Segmenter("ko", { granularity: "grapheme" }).segment(str)[Symbol.iterator]().next();
+      return it.done ? "" : it.value.segment;
+    }
+    return Array.from(str)[0] || "";
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var title = form.title.value.trim();
+    if (!title) {
+      addMsg.textContent = "영화 제목을 입력해 주세요.";
+      form.title.focus();
+      return;
+    }
+    var emoji = firstGrapheme(form.emoji.value.trim()) || DEFAULT_EMOJI;
+    var m = { id: "m" + state.nextId++, title: title.slice(0, 30), emoji: emoji };
+    state.movies.push(m);
+    state.zones.pool.push(m.id);
+    save();
+    render();
+    addMsg.textContent = "";
+    form.reset();
+    form.title.focus();
+    showToast("‘" + m.title + "’을(를) 추가했어요.");
+  });
+  form.title.addEventListener("input", function () { addMsg.textContent = ""; });
+
+  // ---------- 알림 ----------
+  var toastEl = document.getElementById("toast");
+  var toastTimer = null;
+  function showToast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+  }
+
+  // ---------- 이미지로 저장 (브라우저 기본 canvas로 직접 그림) ----------
+  var TEXT_FONT = '"Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif';
+  var EMOJI_FONT = '"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function fitText(ctx, text, maxW) {
+    if (ctx.measureText(text).width <= maxW) return text;
+    var chars = Array.from(text);
+    while (chars.length && ctx.measureText(chars.join("") + "…").width > maxW) chars.pop();
+    return chars.join("") + "…";
+  }
+
+  function exportImage() {
+    var hasAny = TIERS.some(function (t) { return state.zones[t].length > 0; });
+    if (!hasAny) {
+      showToast("등급 칸에 영화를 하나 이상 옮긴 뒤 저장해 주세요.");
+      return;
+    }
+
+    var W = 1000, PAD = 32, TITLE_H = 64, LABEL_W = 100, ROW_GAP = 6;
+    var IN_PAD = 12, CARD_H = 52, CARD_GAP = 10, CARD_PX = 16, EMOJI_W = 28, EMOJI_GAP = 10;
+    var TEXT_SIZE = 20, EMOJI_SIZE = 24;
+    var areaX = PAD + LABEL_W + IN_PAD;
+    var areaW = W - PAD - IN_PAD - areaX;
+
+    var measure = document.createElement("canvas").getContext("2d");
+    measure.font = "600 " + TEXT_SIZE + "px " + TEXT_FONT;
+    var maxTextW = areaW - CARD_PX * 2 - EMOJI_W - EMOJI_GAP;
+
+    // 줄마다 카드 배치 계산
+    var rows = TIERS.map(function (t) {
+      var items = [];
+      var cx = 0, line = 0;
+      state.zones[t].forEach(function (id) {
+        var m = findMovie(id);
+        if (!m) return;
+        var text = fitText(measure, m.title, maxTextW);
+        var w = CARD_PX * 2 + EMOJI_W + EMOJI_GAP + measure.measureText(text).width;
+        if (cx > 0 && cx + w > areaW) { cx = 0; line++; }
+        items.push({ m: m, text: text, x: cx, line: line, w: w });
+        cx += w + CARD_GAP;
+      });
+      var lines = items.length ? line + 1 : 1;
+      var h = Math.max(LABEL_W, IN_PAD * 2 + lines * CARD_H + (lines - 1) * CARD_GAP);
+      return { tier: t, items: items, h: h };
+    });
+
+    var H = PAD + TITLE_H + rows.reduce(function (s, r) { return s + r.h; }, 0) + ROW_GAP * (rows.length - 1) + PAD;
+    var scale = 2;
+    var canvas = document.createElement("canvas");
+    canvas.width = W * scale;
+    canvas.height = H * scale;
+    var ctx = canvas.getContext("2d");
+    ctx.scale(scale, scale);
+
+    ctx.fillStyle = "#15151b";
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 32px " + TEXT_FONT;
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "left";
+    ctx.fillText("내 영화 티어리스트", PAD, PAD + TITLE_H / 2 - 6);
+
+    var y = PAD + TITLE_H;
+    rows.forEach(function (row) {
+      // 줄 배경
+      ctx.save();
+      roundRect(ctx, PAD, y, W - PAD * 2, row.h, 12);
+      ctx.clip();
+      ctx.fillStyle = "#24242d";
+      ctx.fillRect(PAD, y, W - PAD * 2, row.h);
+      ctx.fillStyle = TIER_COLORS[row.tier];
+      ctx.fillRect(PAD, y, LABEL_W, row.h);
+      ctx.restore();
+
+      ctx.fillStyle = "#1a1a1a";
+      ctx.font = "800 44px " + TEXT_FONT;
+      ctx.textAlign = "center";
+      ctx.fillText(row.tier, PAD + LABEL_W / 2, y + row.h / 2 + 2);
+
+      row.items.forEach(function (it) {
+        var cx = areaX + it.x;
+        var cy = y + IN_PAD + it.line * (CARD_H + CARD_GAP);
+        roundRect(ctx, cx, cy, it.w, CARD_H, 10);
+        ctx.fillStyle = "#34343f";
+        ctx.fill();
+        ctx.strokeStyle = "#4a4a57";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.textAlign = "center";
+        ctx.font = EMOJI_SIZE + "px " + EMOJI_FONT;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(it.m.emoji, cx + CARD_PX + EMOJI_W / 2, cy + CARD_H / 2 + 1);
+
+        ctx.textAlign = "left";
+        ctx.font = "600 " + TEXT_SIZE + "px " + TEXT_FONT;
+        ctx.fillStyle = "#f1f1f5";
+        ctx.fillText(it.text, cx + CARD_PX + EMOJI_W + EMOJI_GAP, cy + CARD_H / 2 + 1);
+      });
+
+      y += row.h + ROW_GAP;
+    });
+
+    canvas.toBlob(function (blob) {
+      if (!blob) { showToast("이미지를 만들지 못했어요. 다시 시도해 주세요."); return; }
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "내-영화-티어리스트.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      showToast("이미지를 저장했어요.");
+    }, "image/png");
+  }
+
+  document.getElementById("saveImage").addEventListener("click", exportImage);
+
+  render();
+})();
+</script>
+</body>
+</html>
