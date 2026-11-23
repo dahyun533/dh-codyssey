@@ -7,7 +7,9 @@
 - 후가공·프로토타입: Figma
 
 ## Figma 보기 링크
-- (작성 예정)
+- https://www.figma.com/design/x3suDwV8hS8B4xMWeB1wvH
+- 화면 흐름·Hotspot 캡처: [figma/화면흐름_Hotspot.png](figma/화면흐름_Hotspot.png)
+- 오른쪽 위 ▶(프레젠테이션)으로 실행하면 메뉴·버튼 클릭으로 화면 이동
 
 ## 화면
 | 화면 | 파일 |
