@@ -7,9 +7,10 @@
 - 후가공·프로토타입: Figma
 
 ## Figma 보기 링크
-- https://www.figma.com/design/x3suDwV8hS8B4xMWeB1wvH
+- 프로토타입(바로 클릭해 보기): https://www.figma.com/proto/x3suDwV8hS8B4xMWeB1wvH?node-id=1-8&starting-point-node-id=1-8&scaling=scale-down-width
+- 디자인 파일(프레임·Hotspot 보기): https://www.figma.com/design/x3suDwV8hS8B4xMWeB1wvH
 - 화면 흐름·Hotspot 캡처: [figma/화면흐름_Hotspot.png](figma/화면흐름_Hotspot.png)
-- 오른쪽 위 ▶(프레젠테이션)으로 실행하면 메뉴·버튼 클릭으로 화면 이동
+- 프로토타입에서 상단 메뉴·로고·Play Now·View More·프로필을 누르면 화면 이동
 
 ## 화면
 | 화면 | 최종본 | ChatGPT 원본 | 후가공 |
