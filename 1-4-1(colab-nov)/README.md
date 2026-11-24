@@ -8,7 +8,7 @@
 | ChatGPT 이미지 생성 | 화면 이미지 생성 | Midjourney는 구독이 없어 변경. 대화로 앞 이미지를 레퍼런스로 이어 쓸 수 있음 |
 | Python (Pillow) | 후가공 (아이템 칸 교체, 상단 메뉴 통일) | Figma 대신 사용. 픽셀 단위로 정확히 잘라 붙이고 세 화면 메뉴 위치를 같은 좌표로 맞추며 원본 해상도 유지 |
 | Figma | 화면 배치, Hotspot·화면 전환 | 미션 권장 도구 |
-| Claude (Claude Code) | 기획 질문, 프롬프트 작성, 후가공 코드, Figma 배치·Hotspot 연결 보조 | AI 협업 워크플로우 실습 (판단은 직접 함) |
+| Claude (Claude Code) | 기획 질문, 프롬프트 작성, 후가공 코드, Figma 배치·Hotspot 연결 보조 | AI 협업 워크플로우 실습  |
 
 ## Figma 보기 링크
 - 프로토타입(바로 클릭해 보기): https://www.figma.com/proto/x3suDwV8hS8B4xMWeB1wvH?node-id=1-8&starting-point-node-id=1-8&scaling=scale-down-width
