@@ -2,7 +2,11 @@
 
 여러 게임이 모인 게임 플랫폼 PlayHub의 데스크탑 웹(16:9) 시안.
 
-## 사용한 도구
+<details>
+<summary><b>사용한 도구</b></summary>
+
+<blockquote>
+
 | 도구 | 쓴 곳 | 쓴 이유 |
 |---|---|---|
 | ChatGPT 이미지 생성 | 화면 이미지 생성 | Midjourney는 구독이 없어 변경. 대화로 앞 이미지를 레퍼런스로 이어 쓸 수 있음 |
@@ -10,13 +14,29 @@
 | Figma | 화면 배치, Hotspot·화면 전환 | 미션 권장 도구 |
 | Claude (Claude Code) | 기획 질문, 프롬프트 작성, 후가공 코드, Figma 배치·Hotspot 연결 보조 | AI 협업 워크플로우 실습  |
 
-## Figma 보기 링크
+</blockquote>
+
+</details>
+
+<details>
+<summary><b>Figma 보기 링크</b></summary>
+
+<blockquote>
+
 - 프로토타입(바로 클릭해 보기): https://www.figma.com/proto/x3suDwV8hS8B4xMWeB1wvH?node-id=1-8&starting-point-node-id=1-8&scaling=scale-down-width
 - 디자인 파일(프레임·Hotspot 보기): https://www.figma.com/design/x3suDwV8hS8B4xMWeB1wvH
 - 화면 흐름·Hotspot 캡처: [figma/화면흐름_Hotspot.png](figma/화면흐름_Hotspot.png)
 - 프로토타입에서 상단 메뉴·로고·Play Now·View More·프로필을 누르면 화면 이동
 
-## 화면
+</blockquote>
+
+</details>
+
+<details>
+<summary><b>화면</b></summary>
+
+<blockquote>
+
 | 화면 | 최종본 | ChatGPT 원본 | 후가공 |
 |---|---|---|---|
 | 1. 홈 | [ui/화면1_홈.png](ui/화면1_홈.png) | [원본](ui/원본_ChatGPT/화면1_홈_원본.png) | 상단 메뉴 위치·활성 칸 통일 |
@@ -27,7 +47,15 @@
 - 수정 전/후 비교: [아이템 칸](후가공/아바타_전후비교.png), [상단 메뉴](후가공/메뉴_전후비교.png)
 - 깨진 글자: 세 장 모두 없음
 
-## 화면 흐름
+</blockquote>
+
+</details>
+
+<details>
+<summary><b>화면 흐름</b></summary>
+
+<blockquote>
+
 | 출발 화면 | 누르는 곳 | 도착 화면 |
 |---|---|---|
 | 1 홈 | 'Games' 메뉴 / 'Play Now' / 'View More' | 2 게임 목록 |
@@ -39,8 +67,20 @@
 
 - 흐름 시작점: 1 홈 / 클릭 영역(Hotspot) 12개 / 전환: Dissolve
 
-## 문서
+</blockquote>
+
+</details>
+
+<details>
+<summary><b>문서</b></summary>
+
+<blockquote>
+
 - [기획서](md/기획서.md)
 - [작업로그](md/작업로그.md) — 프롬프트 1단계 초안 → 2단계 수정 → 3단계 최종, 바꾼 이유
 - [코랩세션리포트](코랩세션리포트.md)
 - 생성 결과 캡처: `대화 캡처/` (`v1_*` 초안 결과, `v2_*` 수정·최종 결과)
+
+</blockquote>
+
+</details>

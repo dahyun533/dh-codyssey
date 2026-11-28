@@ -2,7 +2,11 @@
 
 미션지 전문을 넣으면 따라 하기 쉬운 워크플로우 매뉴얼로 정리해 주는 AI 페르소나 "스승".
 
-## 결과 요약
+<details>
+<summary><b>결과 요약</b></summary>
+
+<blockquote>
+
 | 항목 | 내용 |
 |---|---|
 | 과업 | 코디세이 미션지를 워크플로우 매뉴얼(한 줄 요약, 핵심 용어 풀이, 진행 순서, 산출물 체크리스트, 놓치기 쉬운 제약)로 정리 |
@@ -12,7 +16,15 @@
 | 대화 검증 | 24턴. 환각 검증 질문 5개 모두 Pass (A 4개, B 1개), 문맥 끊김 없음 |
 | 미해결 | 2건. 출처로 적은 문서가 실제로 있는지, 미션지에 정의가 없는 용어의 뜻이 맞는지 |
 
-## 사용한 도구
+</blockquote>
+
+</details>
+
+<details>
+<summary><b>사용한 도구</b></summary>
+
+<blockquote>
+
 | 도구 | 쓴 곳 |
 |---|---|
 | Claude Opus 5.5 (유료) | 모델 비교, 24턴 대화, Few-shot·v2·v3 실행 |
@@ -20,13 +32,29 @@
 | Gemini 자동 모드 (무료) | 모델 비교 |
 | Claude Code | 문서 정리 보조 |
 
-## 스승 쓰는 법
+</blockquote>
+
+</details>
+
+<details>
+<summary><b>스승 쓰는 법</b></summary>
+
+<blockquote>
+
 1. [system-design.md](docs/system-design.md) 2장의 시스템 프롬프트 v3 전문을 지침 입력란이나 대화 첫 메시지에 넣음
 2. 그 아래에 유저 프롬프트 "아래 미션지를 양식대로 정리해 줘."를 씀
 3. 바로 아래에 3장의 입력 템플릿 v3 전문을 붙임
 4. 3-1의 [미션지], [가상 마리너 과업], [출력 범위] 칸을 채워 보냄
 
-## 문서
+</blockquote>
+
+</details>
+
+<details>
+<summary><b>문서</b></summary>
+
+<blockquote>
+
 | 순서 | 문서 | 한 줄 소개 |
 |---|---|---|
 | 1 | [model-comparison.md](docs/model-comparison.md) | 모델 3종에 같은 프롬프트를 넣고 같은 기준으로 비교해 하나를 고른 보고서 |
@@ -34,7 +62,15 @@
 | 3 | [run-log.md](docs/run-log.md) | 작업 기록과 10턴 이상 대화 전문, 환각·문맥 끊김 표시 |
 | 4 | [unresolved.md](docs/unresolved.md) | 프롬프트를 고쳐도 원하는 결과가 안 나온 과업 기록 |
 
-## 폴더 구조
+</blockquote>
+
+</details>
+
+<details>
+<summary><b>폴더 구조</b></summary>
+
+<blockquote>
+
 ```
 1-1-1(mission1)/
 ├── README.md
@@ -44,3 +80,7 @@
     ├── run-log.md
     └── unresolved.md
 ```
+
+</blockquote>
+
+</details>
